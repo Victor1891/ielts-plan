@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>雅思自学计划 | 每日打卡</title>
+<style>
+  :root {
+    --primary: #3B82F6;
+    --success: #10B981;
+    --warning: #F59E0B;
+    --danger: #EF4444;
+    --purple: #8B5CF6;
+    --bg: #F3F4F6;
+    --card: #FFFFFF;
+    --text: #1F2937;
+    --text-light: #6B7280;
+    --border: #E5E7EB;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* 顶部导航 */
+  .navbar {
+    background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+    color: white;
+    padding: 16px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  .navbar-content {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .navbar h1 {
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+  .navbar-badge {
+    background: rgba(255,255,255,0.2);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px 16px;
+  }
+
+  /* 打卡卡片 */
+  .checkin-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    text-align: center;
+  }
+  .checkin-number {
+    font-size: 4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #1E40AF, #3B82F6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+  }
+  .checkin-label {
+    font-size: 1rem;
+    color: var(--text-light);
+    margin-top: 4px;
+  }
+  .checkin-date {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .checkin-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 8px;
+  }
+  .status-done {
+    background: #D1FAE5;
+    color: #059669;
+  }
+  .status-pending {
+    background: #FEF3C7;
+    color: #D97706;
+  }
+
+  /* 今日任务 */
+  .today-section {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .section-icon {
+    font-size: 1.5rem;
+  }
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+  .section-tag {
+    margin-left: auto;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+  .tag-today {
+    background: #DBEAFE;
+    color: #1E40AF;
+  }
+  .tag-review {
+    background: #F3E8FF;
+    color: #7C3AED;
+  }
+
+  .task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    transition: all 0.2s;
+  }
+  .task-item:last-child { margin-bottom: 0; }
+  .task-item:hover {
+    background: var(--bg);
+  }
+  .task-check {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .task-check.checked {
+    background: var(--success);
+    border-color: var(--success);
+    color: white;
+  }
+  .task-content { flex: 1; }
+  .task-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+  }
+  .task-desc {
+    font-size: 0.82rem;
+    color: var(--text-light);
+  }
+  .task-time {
+    font-size: 0.78rem;
+    color: var(--text-light);
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .task-status {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .status-reading {
+    background: #DBEAFE;
+    color: #1E40AF;
+  }
+  .status-listening {
+    background: #D1FAE5;
+    color: #059669;
+  }
+  .status-speaking {
+    background: #FCE7F3;
+    color: #BE185D;
+  }
+  .status-writing {
+    background: #FEF3C7;
+    color: #D97706;
+  }
+
+  /* 每日词汇 */
+  .vocab-section {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .vocab-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .vocab-item {
+    background: var(--bg);
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+  }
+  .vocab-en {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+  }
+  .vocab-cn {
+    font-size: 0.82rem;
+    color: var(--text-light);
+  }
+
+  /* 阶段进度 */
+  .progress-section {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .progress-item {
+    margin-bottom: 20px;
+  }
+  .progress-item:last-child { margin-bottom: 0; }
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .progress-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .progress-value {
+    font-size: 0.85rem;
+    color: var(--text-light);
+  }
+  .progress-bar {
+    height: 10px;
+    background: var(--bg);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.5s ease;
+  }
+  .fill-lv1 { background: linear-gradient(90deg, #3B82F6, #60A5FA); }
+  .fill-lv2 { background: linear-gradient(90deg, #10B981, #34D399); }
+  .fill-lv3 { background: linear-gradient(90deg, #8B5CF6, #A78BFA); }
+  .fill-lv4 { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
+
+  /* 周计划 */
+  .week-section {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+  }
+  .week-day {
+    text-align: center;
+    padding: 10px 4px;
+    border-radius: 10px;
+    background: var(--bg);
+  }
+  .week-day.active {
+    background: linear-gradient(135deg, #1E40AF, #3B82F6);
+    color: white;
+  }
+  .week-day.done {
+    background: #D1FAE5;
+  }
+  .week-day-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .week-day-status {
+    font-size: 1.2rem;
+  }
+
+  /* 快捷操作 */
+  .quick-actions {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .action-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .action-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: none;
+    background: var(--bg);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .action-btn span:first-child {
+    font-size: 1.3rem;
+  }
+
+  @media (max-width: 500px) {
+    .vocab-grid { grid-template-columns: repeat(2, 1fr); }
+    .week-grid { grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .week-day { padding: 8px 2px; }
+    .week-day-name { font-size: 0.65rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 导航栏 -->
+<nav class="navbar">
+  <div class="navbar-content">
+    <h1>📚 雅思自学计划</h1>
+    <span class="navbar-badge" id="todayDate"></span>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- 打卡卡片 -->
+  <div class="checkin-card">
+    <div class="checkin-number" id="dayCount">1</div>
+    <div class="checkin-label">天坚持学习</div>
+    <div class="checkin-status status-pending" id="todayStatus">今日待完成</div>
+    <div class="checkin-date" id="startDate">开始日期：2026年3月29日</div>
+  </div>
+
+  <!-- 今日任务 -->
+  <div class="today-section">
+    <div class="section-header">
+      <span class="section-icon">🎯</span>
+      <span class="section-title">今日任务</span>
+      <span class="section-tag tag-today" id="todayLabel">Day 1</span>
+    </div>
+
+    <div class="task-item">
+      <div class="task-check" id="task1" onclick="toggleTask('task1')"></div>
+      <div class="task-content">
+        <div class="task-name">🌅 背单词（15个新词）</div>
+        <div class="task-desc">Day 1 — 时间与数字 · 打开 Daily App 学习新词</div>
+        <div class="task-time">⏱️ 约30分钟 · 底线任务</div>
+      </div>
+      <span class="task-status status-reading">单词</span>
+    </div>
+
+    <div class="task-item">
+      <div class="task-check" id="task2" onclick="toggleTask('task2')"></div>
+      <div class="task-content">
+        <div class="task-name">🎧 听力训练</div>
+        <div class="task-desc">BBC 6 Minute English · 第一遍盲听，第二遍看字幕，第三遍跟读</div>
+        <div class="task-time">⏱️ 约30分钟</div>
+      </div>
+      <span class="task-status status-listening">听力</span>
+    </div>
+
+    <div class="task-item">
+      <div class="task-check" id="task3" onclick="toggleTask('task3')"></div>
+      <div class="task-content">
+        <div class="task-name">📝 晚间专项</div>
+        <div class="task-desc" id="eveningTask">周日复习测试 · 复习本周所有词汇</div>
+        <div class="task-time">⏱️ 约60分钟</div>
+      </div>
+      <span class="task-status status-writing" id="eveningTag">复习</span>
+    </div>
+  </div>
+
+  <!-- 今日词汇预览 -->
+  <div class="vocab-section">
+    <div class="section-header">
+      <span class="section-icon">📝</span>
+      <span class="section-title">今日词汇 — Day 1</span>
+      <span class="section-tag tag-review">时间与数字</span>
+    </div>
+    <div class="vocab-grid">
+      <div class="vocab-item"><div class="vocab-en">annual</div><div class="vocab-cn">每年的</div></div>
+      <div class="vocab-item"><div class="vocab-en">decade</div><div class="vocab-cn">十年</div></div>
+      <div class="vocab-item"><div class="vocab-en">century</div><div class="vocab-cn">世纪</div></div>
+      <div class="vocab-item"><div class="vocab-en">current</div><div class="vocab-cn">当前的</div></div>
+      <div class="vocab-item"><div class="vocab-en">recent</div><div class="vocab-cn">最近的</div></div>
+      <div class="vocab-item"><div class="vocab-en">period</div><div class="vocab-cn">时期</div></div>
+      <div class="vocab-item"><div class="vocab-en">duration</div><div class="vocab-cn">持续时间</div></div>
+      <div class="vocab-item"><div class="vocab-en">roughly</div><div class="vocab-cn">大约</div></div>
+      <div class="vocab-item"><div class="vocab-en">approximately</div><div class="vocab-cn">大约</div></div>
+      <div class="vocab-item"><div class="vocab-en">proportion</div><div class="vocab-cn">比例</div></div>
+      <div class="vocab-item"><div class="vocab-en">figure</div><div class="vocab-cn">数字</div></div>
+      <div class="vocab-item"><div class="vocab-en">percentage</div><div class="vocab-cn">百分比</div></div>
+      <div class="vocab-item"><div class="vocab-en">steady</div><div class="vocab-cn">稳定的</div></div>
+      <div class="vocab-item"><div class="vocab-en">gradual</div><div class="vocab-cn">逐渐的</div></div>
+      <div class="vocab-item"><div class="vocab-en">dramatic</div><div class="vocab-cn">显著的</div></div>
+    </div>
+  </div>
+
+  <!-- 词汇进度 -->
+  <div class="progress-section">
+    <div class="section-header">
+      <span class="section-icon">📊</span>
+      <span class="section-title">词汇进度</span>
+    </div>
+
+    <div class="progress-item">
+      <div class="progress-header">
+        <span class="progress-label">Lv.1 基础高频词</span>
+        <span class="progress-value">300 → 1500</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill fill-lv1" id="lv1Progress" style="width: 5%"></div>
+      </div>
+    </div>
+
+    <div class="progress-item">
+      <div class="progress-header">
+        <span class="progress-label">Lv.2 四六级+雅思基础</span>
+        <span class="progress-value">1500 → 3500</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill fill-lv2" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <div class="progress-item">
+      <div class="progress-header">
+        <span class="progress-label">Lv.3 雅思核心词</span>
+        <span class="progress-value">3500 → 5000</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill fill-lv3" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <div class="progress-item">
+      <div class="progress-header">
+        <span class="progress-label">Lv.4 高分替换词</span>
+        <span class="progress-value">5000 → 6000+</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill fill-lv4" style="width: 0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 周计划 -->
+  <div class="week-section">
+    <div class="section-header">
+      <span class="section-icon">📅</span>
+      <span class="section-title">本周节奏</span>
+    </div>
+    <div class="week-grid">
+      <div class="week-day" id="week1"><div class="week-day-name">周一</div><div class="week-day-status">📖</div></div>
+      <div class="week-day" id="week2"><div class="week-day-name">周二</div><div class="week-day-status">✏️</div></div>
+      <div class="week-day" id="week3"><div class="week-day-name">周三</div><div class="week-day-status">📖</div></div>
+      <div class="week-day" id="week4"><div class="week-day-name">周四</div><div class="week-day-status">✏️</div></div>
+      <div class="week-day" id="week5"><div class="week-day-name">周五</div><div class="week-day-status">📖</div></div>
+      <div class="week-day" id="week6"><div class="week-day-name">周六</div><div class="week-day-status">🗣️</div></div>
+      <div class="week-day" id="week7"><div class="week-day-name">周日</div><div class="week-day-status">🔄</div></div>
+    </div>
+    <div style="margin-top: 12px; font-size: 0.8rem; color: var(--text-light);">
+      📖 阅读 · ✏️ 写作 · 🗣️ 口语 · 🔄 复习测试
+    </div>
+  </div>
+
+  <!-- 快捷操作 -->
+  <div class="quick-actions">
+    <div class="section-header">
+      <span class="section-icon">⚡</span>
+      <span class="section-title">快捷操作</span>
+    </div>
+    <div class="action-grid">
+      <button class="action-btn" onclick="markAllDone()">
+        <span>✅</span> 全部完成
+      </button>
+      <button class="action-btn" onclick="resetTasks()">
+        <span>🔄</span> 重置任务
+      </button>
+      <button class="action-btn" onclick="nextDay()">
+        <span>➡️</span> 进入下一天
+      </button>
+      <button class="action-btn" onclick="showTest()">
+        <span>📝</span> 做测试题
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // 配置
+  const START_DATE = new Date('2026-03-29');
+  const TOTAL_WORDS_LV1 = 1200;
+  const WORDS_LEARNED = 75; // Day 1-5 已学
+
+  // 今日任务数据（每周轮换）
+  const WEEK_TASKS = {
+    0: { name: '📝 晚间专项', desc: '周日复习测试 · 复习本周所有词汇', tag: '复习', tagClass: 'status-writing' },
+    1: { name: '📖 晚间专项', desc: '精读 BBC 简易新闻 · 查生词理解大意', tag: '阅读', tagClass: 'status-reading' },
+    2: { name: '✏️ 晚间专项', desc: '写作练习 · 用今天学的词写5个句子', tag: '写作', tagClass: 'status-writing' },
+    3: { name: '📖 晚间专项', desc: '精读 BBC 简易新闻 · 查生词理解大意', tag: '阅读', tagClass: 'status-reading' },
+    4: { name: '✏️ 晚间专项', desc: '写作练习 · 用今天学的词写5个句子', tag: '写作', tagClass: 'status-writing' },
+    5: { name: '🗣️ 晚间专项', desc: '口语练习 · 选一个话题，说30秒英语', tag: '口语', tagClass: 'status-speaking' },
+    6: { name: '🔄 晚间专项', desc: '周日复习测试 · 复习本周所有词汇', tag: '复习', tagClass: 'status-writing' }
+  };
+
+  // 初始化
+  function init() {
+    const today = new Date();
+    const dayCount = Math.floor((today - START_DATE) / (1000 * 60 * 60 * 24)) + 1;
+    const dayOfWeek = today.getDay();
+    const weekNumber = Math.ceil(dayCount / 7);
+    const dayInWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+
+    // 更新日期显示
+    document.getElementById('todayDate').textContent = 
+      `${today.getMonth() + 1}月${today.getDate()}日`;
+    document.getElementById('dayCount').textContent = dayCount;
+
+    // 更新今日任务
+    const todayTask = WEEK_TASKS[dayOfWeek];
+    document.getElementById('eveningTask').textContent = todayTask.desc;
+    document.getElementById('eveningTag').textContent = todayTask.tag;
+    document.getElementById('eveningTag').className = `task-status ${todayTask.tagClass}`;
+
+    // 更新进度条
+    const lv1Percent = Math.min(100, Math.round((WORDS_LEARNED / TOTAL_WORDS_LV1) * 100));
+    document.getElementById('lv1Progress').style.width = lv1Percent + '%';
+
+    // 更新周计划高亮
+    for (let i = 1; i <= 7; i++) {
+      const el = document.getElementById('week' + i);
+      if (i === dayInWeek + 1) {
+        el.classList.add('active');
+      } else if (i < dayInWeek + 1) {
+        el.classList.add('done');
+        el.querySelector('.week-day-status').textContent = '✓';
+      }
+    }
+
+    // 更新状态
+    updateStatus();
+  }
+
+  // 切换任务完成状态
+  function toggleTask(taskId) {
+    const el = document.getElementById(taskId);
+    el.classList.toggle('checked');
+    updateStatus();
+  }
+
+  // 更新打卡状态
+  function updateStatus() {
+    const tasks = document.querySelectorAll('.task-check');
+    const checked = document.querySelectorAll('.task-check.checked');
+    const statusEl = document.getElementById('todayStatus');
+    
+    if (checked.length === tasks.length) {
+      statusEl.textContent = '✅ 今日已完成';
+      statusEl.className = 'checkin-status status-done';
+    } else {
+      statusEl.textContent = `${checked.length}/${tasks.length} 任务完成`;
+      statusEl.className = 'checkin-status status-pending';
+    }
+  }
+
+  // 标记全部完成
+  function markAllDone() {
+    document.querySelectorAll('.task-check').forEach(el => el.classList.add('checked'));
+    updateStatus();
+  }
+
+  // 重置任务
+  function resetTasks() {
+    document.querySelectorAll('.task-check').forEach(el => el.classList.remove('checked'));
+    updateStatus();
+  }
+
+  // 进入下一天（手动推进，用于测试）
+  function nextDay() {
+    alert('下一天功能开发中...\n实际日期会自动推进。');
+  }
+
+  // 显示测试题
+  function showTest() {
+    alert('📝 测试题功能\n\n今晚来找我做 Day 1-5 的测试题！\n题型：选择题 + 听写题');
+  }
+
+  init();
+</script>
+
+</body>
+</html>
